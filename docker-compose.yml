@@ -1,0 +1,64 @@
+services:
+  # ------------------------------
+  # Microservicios Node.js
+  # ------------------------------
+  user-service:
+    build: ./user-service
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongo-users
+
+  product-service:
+    build: ./product-service
+    ports:
+      - "3002:3002"
+    depends_on:
+      - mongo-products
+
+  order-service:
+    build: ./order-service
+    ports:
+      - "3003:3003"
+    depends_on:
+      - mongo-orders
+
+  gateway:
+    build: ./gateway
+    ports:
+      - "3000:3000"
+    depends_on:
+      - user-service
+      - product-service
+      - order-service
+
+  # ------------------------------
+  # MongoDB
+  # ------------------------------
+  mongo-users:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - users-data:/data/db
+
+  mongo-products:
+    image: mongo
+    ports:
+      - "27018:27017"
+    volumes:
+      - products-data:/data/db
+
+  mongo-orders:
+    image: mongo
+    ports:
+      - "27019:27017"
+    volumes:
+      - orders-data:/data/db
+
+volumes:
+  users-data:
+  products-data:
+  orders-data:
+
+
