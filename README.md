@@ -145,7 +145,7 @@ kubectl label namespace proyectom istio-injection=enabled
 
 <img width="1093" height="521" alt="image" src="https://github.com/user-attachments/assets/1c7be917-6594-4cdb-ac15-7186bc3cfdce" />
 
-##Insertamos los datos en la base para empezar a monitorear que vaya bien
+## Insertamos los datos en la base para empezar a monitorear que vaya bien
 
 
 <img width="1113" height="303" alt="image" src="https://github.com/user-attachments/assets/31cf32fc-86bd-4a89-97ae-12c47ba5f3b0" />
