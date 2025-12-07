@@ -1,158 +1,138 @@
-🧩 Proyecto de Microservicios — README
-📌 Descripción del Proyecto
+# Proyecto Microservicios con Istio y Kiali
 
-Este proyecto implementa una arquitectura basada en microservicios, utilizando Node.js, Express, MongoDB, Docker, Docker Compose y Kubernetes.
+## Descripción
 
-Cada microservicio representa un módulo independiente:
+Esta aplicación implementa un **sistema de microservicios** modular y escalable, con:
 
-User Service → Gestión de usuarios
+- **User Service**: gestión de usuarios
+- **Order Service**: gestión de órdenes
+- **Product Service**: gestión de productos
+- **API Gateway**: punto de entrada único a los servicios
 
-Product Service → Gestión de productos
+Todos los microservicios se conectan a **MongoDB** y se despliegan en **Kubernetes**, con monitorización de tráfico usando **Istio** y **Kiali**.
 
-Order Service → Gestión de órdenes
+---
 
-Gateway API → Punto de entrada (API Gateway)
+## Requisitos
 
-Cada servicio tiene su propia base de datos MongoDB independiente.
+- Docker Desktop (con Kubernetes habilitado)
+- Kubectl
+- Istioctl
+- Node.js y npm
+- Git
 
-🧱 Estructura del Proyecto
+---
+
+## Estructura del proyecto
+
+```text
 proyectom/
-│
-├── gateway/
-│   ├── Dockerfile
-│   └── server.js
-│
-├── user-service/
-│   ├── Dockerfile
-│   ├── server.js
-│   └── models/
-│
-├── product-service/
-│   ├── Dockerfile
-│   ├── server.js
-│   └── models/
-│
-├── order-service/
-│   ├── Dockerfile
-│   ├── server.js
-│   └── models/
-│
-├── k8s/
-│   ├── namespace.yml
-│   ├── gateway-deployment.yml
-│   ├── gateway-service.yml
-│   ├── mongo-users-deployment.yml
-│   ├── mongo-users-service.yml
-│   ├── mongo-products-deployment.yml
-│   ├── mongo-products-service.yml
-│   ├── mongo-orders-deployment.yml
-│   ├── mongo-orders-service.yml
-│   ├── user-service-deployment.yml
-│   ├── user-service-service.yml
-│   ├── product-service-deployment.yml
-│   ├── product-service-service.yml
-│   ├── order-service-deployment.yml
-│   └── order-service-service.yml
-│
-└── docker-compose.yml
-
-🚀 Cómo Ejecutarlo con Docker Compose
-1️⃣ Construir y levantar todo
-
-En la raíz del proyecto:
-
-docker compose up --build
+├─ gateway/
+├─ user-service/
+├─ order-service/
+├─ product-service/
+├─ k8s/
+│  ├─ mongo/
+│  ├─ user-service/
+│  ├─ order-service/
+│  ├─ product-service/
+├─ istio/
+│  ├─ proyectom-gateway.yml
+│  ├─ proyectom-virtualservice.yml
+├─ kiali-cr.yml
 
 
-Esto creará:
+Despliegue paso a paso
+1️⃣ Clonar el repositorio
+bash
+Copiar código
+git clone https://github.com/piripinpon/proyecto
+cd proyectom
+2️⃣ Construir imágenes Docker
+bash
+Copiar código
+docker build -t user-service ./user-service
+docker build -t order-service ./order-service
+docker build -t product-service ./product-service
+docker build -t gateway ./gateway
+3️⃣ Desplegar MongoDB
+bash
+Copiar código
+kubectl apply -f k8s/mongo/
+4️⃣ Desplegar microservicios y gateway
+bash
+Copiar código
+kubectl apply -f k8s/user-service/
+kubectl apply -f k8s/order-service/
+kubectl apply -f k8s/product-service/
+kubectl apply -f k8s/gateway/
+5️⃣ Instalar Istio y habilitar sidecar injection
+bash
+Copiar código
+istioctl install --set profile=demo -y
+kubectl label namespace proyectom istio-injection=enabled
 
-3 microservicios
+<img width="1120" height="579" alt="image" src="https://github.com/user-attachments/assets/3869c8af-8e2e-4c21-bd88-74be0ab64361" />
+<img width="889" height="170" alt="image" src="https://github.com/user-attachments/assets/3773a2ee-bfd5-419a-9a6f-3e4f0ae41831" />
 
-Gateway
+Aplica Istio Gateway y VirtualService:
 
-3 contenedores MongoDB
+bash
+Copiar código
+kubectl apply -f istio/proyectom-gateway.yml
+kubectl apply -f istio/proyectom-virtualservice.yml
 
-Red de comunicación interna
-
-🧪 Probar Microservicios (Docker)
-➤ Crear un usuario
-curl -X POST http://localhost:3001/users \
--H "Content-Type: application/json" \
--d "{ \"name\": \"Alex\" }"
-
-➤ Crear un producto
-curl -X POST http://localhost:3002/products \
--H "Content-Type: application/json" \
--d "{ \"name\": \"Laptop\", \"price\": 1500 }"
-
-➤ Crear una orden
-
-Reemplazando los IDs devueltos por MongoDB:
-
-curl -X POST http://localhost:3003/orders \
--H "Content-Type: application/json" \
--d "{ \"userId\": \"ID_ALEX\", \"productId\": \"ID_LAPTOP\" }"
-
-➤ Consultar órdenes
-curl http://localhost:3003/orders
-
-☸️ Deploy en Kubernetes
-1️⃣ Crear Namespace
-kubectl apply -f k8s/namespace.yml
-
-2️⃣ Desplegar todo el proyecto
-kubectl apply -f k8s/
-
-3️⃣ Verificar pods
+6️⃣ Verificar servicios
+bash
+Copiar código
 kubectl get pods -n proyectom
-
-
-Ejemplo de salida correcta:
-
-mongo-users       Running
-mongo-products    Running
-mongo-orders      Running
-user-service      Running
-product-service   Running
-order-service     Running
-gateway           Running
-
-4️⃣ Ver servicios
 kubectl get svc -n proyectom
+kubectl get svc -n istio-system
+El gateway expone el puerto 8080 en localhost.
 
 
-El Gateway expone un NodePort, por ejemplo:
+7️⃣ Población de la base de datos
+bash
+Copiar código
+# Usuarios
+kubectl exec -it mongo-users-<pod> -- mongosh
+use users_db
+db.users.insertMany([{ name: "Rafael", email: "rafael@example.com" }, { name: "Ana", email: "ana@example.com" }])
 
-gateway NodePort 3000:32000/TCP
+# Productos
+kubectl exec -it mongo-products-<pod> -- mongosh
+use products_db
+db.products.insertMany([{ name: "Laptop", price: 1200 }, { name: "Mouse", price: 20 }])
+
+# Órdenes
+kubectl exec -it mongo-orders-<pod> -- mongosh
+use orders_db
+db.orders.insertMany([{ productId: "1", userId: "1", quantity: 1 }, { productId: "2", userId: "2", quantity: 2 }])
+
+<img width="1113" height="303" alt="image" src="https://github.com/user-attachments/assets/31cf32fc-86bd-4a89-97ae-12c47ba5f3b0" />
+
+8️⃣ Probar rutas a través del Gateway
+bash
+Copiar código
+curl http://localhost:8080/users
+curl http://localhost:8080/products
+curl http://localhost:8080/orders
+<img width="1101" height="180" alt="image" src="https://github.com/user-attachments/assets/40a57be8-b816-4cbe-8596-95a9d3f65c93" />
+
+9️⃣ Monitoreo con Kiali
+Accede a la consola de Kiali para ver flujo de tráfico en tiempo real.
+<img width="1338" height="850" alt="Captura de pantalla 2025-12-07 125935" src="https://github.com/user-attachments/assets/d045e11c-ca87-4332-a426-abdc8c7f38ad" />
+
+Haz requests mientras observas el tráfico y la comunicación entre microservicios.
+
+🔟 Ingeniería del caos prueba
+Reinicia un microservicio para probar resiliencia:
+<img width="650" height="195" alt="Captura de pantalla 2025-12-07 131305" src="https://github.com/user-attachments/assets/1fbbc2ee-0e84-4aee-8b23-4b376f96f165" />
+
+Usamos este comando para provocar el problema kubectl delete pod -n proyectom product-service-7b456cf9c7-4d2dz
+pod "product-service-7b456cf9c7-4d2dz" deleted from proyectom namespace
+
+<img width="726" height="237" alt="image" src="https://github.com/user-attachments/assets/c0e0338a-230c-4002-8ebb-b7f525a75e55" />
 
 
-Entonces la API se accede en:
 
-👉 http://localhost:32000
-
-🧪 Probar Microservicios en Kubernetes
-Crear usuario
-curl -X POST http://localhost:32000/users \
--H "Content-Type: application/json" \
--d "{ \"name\": \"Alex\" }"
-
-Crear producto
-curl -X POST http://localhost:32000/products \
--H "Content-Type: application/json" \
--d "{ \"name\": \"Laptop\", \"price\": 1500 }"
-
-Crear orden
-curl -X POST http://localhost:32000/orders \
--H "Content-Type: application/json" \
--d "{ \"userId\": \"ID_ALEX\", \"productId\": \"ID_LAPTOP\" }"
-
-✔️ Estado Actual del Proyecto
-
-Hasta este punto, ya lograste:
-
-✔ Microservicios funcionales
-✔ Bases de datos independientes
-✔ Docker + Docker Compose
-✔ Kubernetes con deployments + services
-✔ Namespace configurado
-✔ Pruebas con CURL funcionando
