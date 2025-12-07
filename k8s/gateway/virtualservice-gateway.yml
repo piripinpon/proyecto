@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: proyectom-route
+  namespace: proyectom
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - proyectom-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: gateway.proyectom.svc.cluster.local
+        port:
+          number: 3000

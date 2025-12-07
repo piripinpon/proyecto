@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: order-service
-          image: order-service:latest
-          imagePullPolicy: Never
+          image: alexis246/proyectom-order-service:v1
+          imagePullPolicy: Always
           ports:
             - containerPort: 3003
           env:
@@ -26,3 +26,4 @@ spec:
               value: "http://user-service:3001"
             - name: PRODUCT_SERVICE_URL
               value: "http://product-service:3002"
+
