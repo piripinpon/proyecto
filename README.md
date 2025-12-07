@@ -158,10 +158,16 @@ pruebas
 <img width="1101" height="180" alt="image" src="https://github.com/user-attachments/assets/40a57be8-b816-4cbe-8596-95a9d3f65c93" />
 
 
-## Con esas pruebas monitoreamos el andar de kiali y monitoreamos 
+## Con esas pruebas monitoreamos con ayuda de kiali 
 
 
 <img width="1338" height="850" alt="Captura de pantalla 2025-12-07 125935" src="https://github.com/user-attachments/assets/d045e11c-ca87-4332-a426-abdc8c7f38ad" />
+
+
+<img width="1350" height="844" alt="Captura de pantalla 2025-12-07 123823" src="https://github.com/user-attachments/assets/fa43359c-1812-47eb-9ba5-b63a16a7f06f" />
+
+
+<img width="586" height="302" alt="Captura de pantalla 2025-12-07 131118" src="https://github.com/user-attachments/assets/d74b8554-f219-4d10-a1b3-5146b596eba9" />
 
 
 ## Como prueba de caos, usamos este comando para generar el problema y asi ver que cae, que es remplazado y tarda un poco en responder a llamados
