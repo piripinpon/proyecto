@@ -25,7 +25,7 @@ Todos los microservicios se conectan a **MongoDB** y se despliegan en **Kubernet
 
 ## Estructura del proyecto
 
-```text
+
 proyectom/
 ├─ gateway/
 ├─ user-service/
